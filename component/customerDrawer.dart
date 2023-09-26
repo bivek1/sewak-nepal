@@ -45,7 +45,6 @@ class _CustomerDrawerState extends State<CustomerDrawer> {
               Navigator.pushNamed(context, 'customer_member');
             },
           ),
-
           ListTile(
             leading: Icon(Icons.newspaper),
             title: Text('News'),
@@ -62,23 +61,6 @@ class _CustomerDrawerState extends State<CustomerDrawer> {
               Navigator.pushNamed(context, 'customer_event');
             },
           ),
-
-          // ListTile(
-          //   leading: Icon(Icons.money),
-          //   title: Text('Donation List'),
-          //   onTap: () {
-          //     // TODO: Handle navigation to settings
-          //     Navigator.pushNamed(context, 'donation');
-          //   },
-          // ),
-          // ListTile(
-          //   leading: Icon(Icons.food_bank),
-          //   title: Text('Jensy Donation'),
-          //   onTap: () {
-          //     // TODO: Handle navigation to settings
-          //     Navigator.pushNamed(context, 'jensy');
-          //   },
-          // ),
           ListTile(
             leading: Icon(Icons.support),
             title: Text('Volunteer Form'),
@@ -95,13 +77,12 @@ class _CustomerDrawerState extends State<CustomerDrawer> {
               Navigator.pushNamed(context, 'customer_bank');
             },
           ),
-
           ListTile(
             leading: Icon(Icons.photo_album),
             title: Text('Photos'),
             onTap: () {
               // TODO: Handle navigation to settings
-              Navigator.pushNamed(context, 'gallary');
+              Navigator.pushNamed(context, 'customer_photo');
             },
           ),
           ListTile(
@@ -109,7 +90,7 @@ class _CustomerDrawerState extends State<CustomerDrawer> {
             title: Text('Video'),
             onTap: () {
               // TODO: Handle navigation to settings
-              Navigator.pushNamed(context, 'gallary');
+              Navigator.pushNamed(context, 'customer_video');
             },
           ),
           ListTile(
@@ -136,7 +117,6 @@ class _CustomerDrawerState extends State<CustomerDrawer> {
               Navigator.pushNamed(context, 'customer_staff');
             },
           ),
-
           ListTile(
             leading: Icon(Icons.facebook_rounded),
             title: Text('Connect with us'),
@@ -145,7 +125,6 @@ class _CustomerDrawerState extends State<CustomerDrawer> {
               Navigator.pushNamed(context, 'customer_social');
             },
           ),
-
           ListTile(
             leading: Icon(Icons.logout),
             title: Text('Logout'),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sewak/component/customerDrawer.dart';
 import 'package:sewak/component/drawer.dart';
+import 'package:sewak/customer/eventDetail.dart';
 import 'package:sewak/owner/crud/modal.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -32,39 +33,12 @@ class _CustomerEventState extends State<CustomerEvent> {
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(children: [
-            // Add other widgets above the StreamBuild
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14.0),
-              child: TextField(
-                controller: searchController,
-                decoration: InputDecoration(
-                  hintText: 'Search by title',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    searchQuery = value;
-                  });
-                },
-              ),
-            ),
-
             Divider(),
             Expanded(
               child: EventList(searchQuery: searchQuery),
             ),
           ]),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.pushNamed(context, 'addEvent');
-          },
-          child: Icon(Icons.add),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
     );
   }
@@ -142,22 +116,22 @@ class _EventListState extends State<EventList> {
                           5, // Add some elevation for a card-like appearance
                       child: InkWell(
                         onTap: () {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => UpdateEvent(
-                          //       id: searchedMembers[index]['id'],
-                          //       title: searchedMembers[index]['title'],
-                          //       description: searchedMembers[index]
-                          //           ['description'],
-                          //       imageUrl:
-                          //           searchedMembers[index]['image'] == null
-                          //               ? ""
-                          //               : searchedMembers[index]['image'],
-                          //       date: formattedCreatedAt,
-                          //     ),
-                          //   ),
-                          // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CustomerEventDetail(
+                                id: searchedMembers[index]['id'],
+                                title: searchedMembers[index]['title'],
+                                description: searchedMembers[index]
+                                    ['description'],
+                                imageUrl:
+                                    searchedMembers[index]['image'] == null
+                                        ? ""
+                                        : searchedMembers[index]['image'],
+                                date: formattedCreatedAt,
+                              ),
+                            ),
+                          );
                         },
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,15 +161,6 @@ class _EventListState extends State<EventList> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // DefaultTextStyle(
-                                  //   style: TextStyle(
-                                  //       fontFamily: 'PrimaryFont',
-                                  //       color: Colors.black
-                                  //       // other text styles
-                                  //       ),
-                                  //   child:
-                                  //       Text(searchedMembers[index]['title']),
-                                  // ),
                                   Container(
                                     height: 50,
                                     child: Text(
@@ -240,119 +205,6 @@ class _EventListState extends State<EventList> {
               )
       ],
     );
-
-    // return StreamBuilder<QuerySnapshot>(
-    //   stream: FirebaseFirestore.instance.collection('news').snapshots(),
-    //   builder: (context, snapshot) {
-    //     if (snapshot.connectionState == ConnectionState.waiting) {
-    //       return CircularProgressIndicator();
-    //     }
-
-    //     if (snapshot.hasError) {
-    //       return Text('Error: ${snapshot.error}');
-    //     }
-
-    //     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-    //       return Text('No news added.');
-    //     }
-
-    //     List<QueryDocumentSnapshot> filteredMembers =
-    //         snapshot.data!.docs.where((member) {
-    //       String fullName = member['title'];
-
-    //       return fullName
-    //           .toLowerCase()
-    //           .contains(widget.searchQuery.toLowerCase());
-    //     }).toList();
-    //     return GridView.builder(
-    //       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-    //         crossAxisCount: 2, // Number of columns
-    //         crossAxisSpacing: 16.0, // Cross-axis spacing
-    //         mainAxisSpacing: 16.0, // Main-axis spacing
-    //       ),
-    //       itemCount: filteredMembers.length,
-    //       itemBuilder: (context, index) {
-    //         var news = filteredMembers[index];
-    //         // String newsidId = news.id;
-    //         // itemCount: snapshot.data!.docs.length,
-    //         // itemBuilder: (context, index) {
-    //         //   var news = snapshot.data!.docs[index];
-    //         String newsId = news.id;
-    //         final currentDateTime = DateTime.now();
-
-    //         // Format the current date and time using intl package's DateFormat
-    //         final formattedDateTime =
-    //             // DateFormat('yyyy-MM-dd HH:mm:ss').format(currentDateTime);
-    //             DateFormat('yyyy-MM-dd').format(currentDateTime);
-
-    //         return Card(
-    //           elevation: 5, // Add some elevation for a card-like appearance
-    //           child: InkWell(
-    //             onTap: () {
-    //               Navigator.push(
-    //                 context,
-    //                 MaterialPageRoute(
-    //                   builder: (context) => UpdateNews(
-    //                     id: news['id'],
-    //                     title: news['title'],
-    //                     description: news['description'],
-    //                     imageUrl: news['url'],
-    //                     date: news['date'],
-    //                   ),
-    //                 ),
-    //               );
-    //             },
-    //             child: Column(
-    //               crossAxisAlignment: CrossAxisAlignment.start,
-    //               children: [
-    //                 Container(
-    //                   // height: 200,
-    //                   width: double.infinity, // Set width to full width
-    //                   child: Image(
-    //                     height: 60,
-    //                     image: NetworkImage(
-    //                       news['url'],
-    //                     ),
-    //                     fit: BoxFit
-    //                         .cover, // You can use BoxFit.cover here if needed
-    //                   ),
-    //                 ),
-    //                 Padding(
-    //                   padding: const EdgeInsets.all(8.0),
-    //                   child: Column(
-    //                     crossAxisAlignment: CrossAxisAlignment.start,
-    //                     children: [
-    //                       Text(
-    //                         truncateWords(news['title'], 6),
-    //                         // news['title'],
-    //                         style: TextStyle(
-    //                           fontSize: 16,
-    //                           fontWeight: FontWeight.w500,
-    //                         ),
-    //                       ),
-    //                       SizedBox(
-    //                         height: 14,
-    //                       ),
-    //                       Row(
-    //                         children: [
-    //                           Icon(Icons.calendar_month),
-    //                           SizedBox(
-    //                             width: 10,
-    //                           ),
-    //                           Text(formattedDateTime),
-    //                         ],
-    //                       ),
-    //                     ],
-    //                   ),
-    //                 ),
-    //               ],
-    //             ),
-    //           ),
-    //         );
-    //       },
-    //     );
-    //   },
-    // );
   }
 
   String truncateWords(String input, int maxWords) {

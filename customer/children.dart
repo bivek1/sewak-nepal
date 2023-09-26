@@ -32,39 +32,16 @@ class _CustomerChildrenState extends State<CustomerChildren> {
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(children: [
-            // Add other widgets above the StreamBuild
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14.0),
-              child: TextField(
-                controller: searchController,
-                decoration: InputDecoration(
-                  hintText: 'Search by title',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    searchQuery = value;
-                  });
-                },
-              ),
+            Text(
+              "Balbalika List",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
             ),
-
             Divider(),
             Expanded(
               child: ChildrenList(searchQuery: searchQuery),
             ),
           ]),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.pushNamed(context, 'addChildren');
-          },
-          child: Icon(Icons.add),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
     );
   }
@@ -142,22 +119,139 @@ class _ChildrenListState extends State<ChildrenList> {
                           5, // Add some elevation for a card-like appearance
                       child: InkWell(
                         onTap: () {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => UpdateChildren(
-                          //       id: searchedMembers[index]['id'],
-                          //       name: searchedMembers[index]['name'],
-                          //       description: searchedMembers[index]
-                          //           ['description'],
-                          //       imageUrl:
-                          //           searchedMembers[index]['image'] == null
-                          //               ? ""
-                          //               : searchedMembers[index]['image'],
-                          //       date: formattedCreatedAt,
-                          //     ),
-                          //   ),
-                          // );
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text("Balbalika Info"),
+                                content: Container(
+                                  height: 280,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        // height: 200,
+                                        width: double
+                                            .infinity, // Set width to full width
+                                        child: searchedMembers[index]
+                                                    ['image'] !=
+                                                null
+                                            ? Image(
+                                                height: 140,
+                                                image: NetworkImage(
+                                                  searchedMembers[index]
+                                                      ['image'],
+                                                ),
+                                                fit: BoxFit
+                                                    .cover, // You can use BoxFit.cover here if needed
+                                              )
+                                            : Container(
+                                                height: 140,
+                                                child: Center(
+                                                    child: Text(
+                                                  "No Image Available",
+                                                  style: TextStyle(
+                                                      color: Colors.grey),
+                                                ))),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              height: 70,
+                                              child: Column(
+                                                children: [
+                                                  Text(
+                                                    truncateWords(
+                                                        searchedMembers[index]
+                                                            ['name'],
+                                                        5),
+                                                    // children['name'],
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text("Age: "),
+                                                      Text(
+                                                          searchedMembers[index]
+                                                                  ['age']
+                                                              .toString())
+                                                    ],
+                                                  ),
+                                                  SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text("Blood Group "),
+                                                      Text(
+                                                          searchedMembers[index]
+                                                              ['blood'])
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 14,
+                                            ),
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.calendar_month,
+                                                  color: Colors.grey,
+                                                ),
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Text(
+                                                  "Joined date: " +
+                                                      formattedCreatedAt,
+                                                  style: TextStyle(
+                                                      color:
+                                                          const Color.fromARGB(
+                                                              255, 73, 73, 73)),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                actions: <Widget>[
+                                  ElevatedButton(
+                                    style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStatePropertyAll<Color>(
+                                                Colors.blueGrey)),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text('Close'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
                         },
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,7 +261,7 @@ class _ChildrenListState extends State<ChildrenList> {
                               width: double.infinity, // Set width to full width
                               child: searchedMembers[index]['image'] != null
                                   ? Image(
-                                      height: 60,
+                                      height: 110,
                                       image: NetworkImage(
                                         searchedMembers[index]['image'],
                                       ),
@@ -175,7 +269,7 @@ class _ChildrenListState extends State<ChildrenList> {
                                           .cover, // You can use BoxFit.cover here if needed
                                     )
                                   : Container(
-                                      height: 60,
+                                      height: 110,
                                       child: Center(
                                           child: Text(
                                         "No Image Available",
@@ -187,61 +281,30 @@ class _ChildrenListState extends State<ChildrenList> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // DefaultTextStyle(
-                                  //   style: TextStyle(
-                                  //       fontFamily: 'PrimaryFont',
-                                  //       color: Colors.black
-                                  //       // other text styles
-                                  //       ),
-                                  //   child:
-                                  //       Text(searchedMembers[index]['name']),
-                                  // ),
-
                                   Container(
-                                    height: 50,
+                                    height: 35,
                                     child: Column(
                                       children: [
-                                        Text(
-                                          truncateWords(
-                                              searchedMembers[index]['name'],
-                                              5),
-                                          // children['name'],
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
+                                        Center(
+                                          child: Text(
+                                            truncateWords(
+                                                searchedMembers[index]['name'],
+                                                5),
+                                            // children['name'],
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
                                           ),
                                         ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Icon(Icons.bloodtype),
-                                            Text(
-                                                searchedMembers[index]['blood'])
-                                          ],
+                                        SizedBox(
+                                          height: 5,
                                         ),
                                       ],
                                     ),
                                   ),
                                   SizedBox(
                                     height: 14,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.calendar_month,
-                                        color: Colors.grey,
-                                      ),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        formattedCreatedAt,
-                                        style: TextStyle(
-                                            color: const Color.fromARGB(
-                                                255, 73, 73, 73)),
-                                      ),
-                                    ],
                                   ),
                                 ],
                               ),

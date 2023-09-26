@@ -1,6 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sewak/component/customerDrawer.dart';
+import 'package:sewak/customer/donation.dart';
+import 'package:sewak/main.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:http/http.dart' as http;
 
 class CustomerDashboard extends StatefulWidget {
   const CustomerDashboard({super.key});
@@ -10,12 +16,99 @@ class CustomerDashboard extends StatefulWidget {
 }
 
 class _CustomerDashboardState extends State<CustomerDashboard> {
+  late String name = "";
   int _selectedIndex = 0;
+  int _usid = 0;
+  int _totalDonation = 0;
+  int _jennsyDonation = 0;
+  int _totalCost = 0;
+  dynamic _dayscount = 0;
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  Future<void> fetchDataForId(int id) async {
+    final apiUrl = 'https://sewak.watnepal.com/api/get-data/$id';
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        // Parse and process the response data here
+        final jsonData = json.decode(response.body);
+        setState(() {
+          name = jsonData['first_name'] + " " + jsonData['last_name'];
+        });
+
+        print(jsonData);
+        print(name);
+        return jsonData;
+        // Do something with jsonData
+      } else if (response.statusCode == 404) {
+        // Handle the case where the object is not found
+        print('Object not found');
+      } else {
+        // Handle other error responses here
+        print('Error: ${response.statusCode}');
+        print('Response: ${response.body}');
+      }
+    } catch (e) {
+      // Handle network errors here
+      print('Network error: $e');
+    }
+  }
+
+  Future<void> fetchDataFromDjango(id) async {
+    final apiUrl = 'https://sewak.watnepal.com/api/get-total/$id';
+    print("Nowww");
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+
+        // Now you can use jsonData to access the data from your Django API.
+
+        int donationCount = jsonData['donation_count'];
+        int jennsyCount = jsonData['jennsy_count'];
+        dynamic daysSinceLastDonation = jsonData['days'];
+        int totalDonations = jsonData['total_donation'];
+
+        // Use the fetched data as needed in your Flutter app.
+        print('Donation Count: $donationCount');
+        print('Jennsy Count: $jennsyCount');
+        print('Days Since Last Donation: $daysSinceLastDonation');
+        print('Total Donation: $totalDonations');
+        setState(() {
+          _totalDonation = donationCount;
+          _jennsyDonation = jennsyCount;
+          _totalCost = totalDonations == null ? 0 : totalDonations;
+          _dayscount = daysSinceLastDonation;
+        });
+      } else {
+        print('Error: ${response.statusCode}');
+        print('Response: ${response.body}');
+      }
+    } catch (e) {
+      print('Network error: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final userIdProvider = Provider.of<UserIdProvider>(context, listen: false);
+    final userId = userIdProvider.userId;
+    setState(() {
+      _usid = userId!;
+    });
+    print("object is given here is " + _usid.toString());
+    fetchDataForId(_usid);
+    print("object is given here " + _usid.toString());
+    fetchDataFromDjango(_usid);
   }
 
   final List<ChartData> monthlyDonations = [
@@ -52,7 +145,8 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Welcome Back!!",
+                    // ignore: prefer_interpolation_to_compose_strings
+                    "Welcome " + name,
                     textAlign: TextAlign.start,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                   ),
@@ -63,18 +157,21 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                DashboardBox(
-                    icon: Image(image: AssetImage('images/donate-sm.jpeg')),
-                    onPressed: () {
-                      Navigator.pushNamed(context, 'donation');
-                    },
-                    title: '300 Donation'),
+                GestureDetector(
+                  onTap: () {},
+                  child: DashboardBox(
+                      icon: Image(image: AssetImage('images/donate-sm.jpeg')),
+                      onPressed: () {
+                        Navigator.pushNamed(context, 'customer_donation');
+                      },
+                      title: _totalDonation.toString() + ' Donation'),
+                ),
                 DashboardBox(
                     icon: Image(image: AssetImage('images/jensy-sm.png')),
                     onPressed: () {
-                      Navigator.pushNamed(context, 'jenssy');
+                      Navigator.pushNamed(context, 'customer_jennsy');
                     },
-                    title: '10 Jennsy'),
+                    title: _jennsyDonation.toString() + ' Jennsy'),
               ],
             ),
             SizedBox(
@@ -87,7 +184,9 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 children: [
                   Center(
                     child: Text(
-                      "तपाईंको अन्तिम दान भएको 23 दिन भयो",
+                      "तपाईंको अन्तिम दान भएको " +
+                          _dayscount.toString() +
+                          " दिन भयो",
                       textAlign: TextAlign.start,
                       style: TextStyle(
                           fontSize: 20,
@@ -129,7 +228,9 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                                 onPressed: () {},
                               ),
                               Text(
-                                "Rs. 5600 donated till now      ",
+                                "Rs. " +
+                                    _totalCost.toString() +
+                                    " donated till now      ",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     fontSize: 15,
@@ -183,13 +284,6 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   ),
                   Divider(),
                   Image(image: AssetImage('images/qr.jpeg')),
-
-                  // SizedBox(
-                  //   height: 20,
-                  // ),
-                  // Expanded(
-                  //   child: MonthlyDonationBarGraph(data: monthlyDonations),
-                  // ),
                 ],
               ),
             ),
@@ -203,11 +297,11 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.people_rounded),
-              label: 'Members',
+              label: 'My Donation',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: 'Settings',
+              icon: Icon(Icons.supervised_user_circle),
+              label: 'Profile',
             ),
           ],
           currentIndex: _selectedIndex,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:sewak/component/drawer.dart';
 import 'dart:io';
@@ -11,7 +10,7 @@ import 'package:sewak/owner/memberCash.dart';
 import 'package:sewak/owner/memberJennsy.dart';
 
 class MemberDetailScreen extends StatefulWidget {
-  final String id;
+  final int id;
   final String name;
   final String number;
   final String imageUrl;
@@ -67,26 +66,26 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
   }
 
   uploadFile() async {
-    try {
-      var imagefile = FirebaseStorage.instance
-          .ref()
-          .child("image")
-          .child("/${widget.name}.jpg");
-      UploadTask task = imagefile.putFile(file!);
-      TaskSnapshot snapshot = await task;
-      url = await snapshot.ref.getDownloadURL();
-      setState(() {
-        url = url;
-      });
-    } on Exception catch (e) {
-      print(e);
-    }
-    await FirebaseFirestore.instance
-        .collection('member')
-        .doc(widget.id)
-        .update({
-      'url': url,
-    }).whenComplete(() => {Navigator.pushNamed(context, 'member')});
+    // try {
+    //   var imagefile = FirebaseStorage.instance
+    //       .ref()
+    //       .child("image")
+    //       .child("/${widget.name}.jpg");
+    //   UploadTask task = imagefile.putFile(file!);
+    //   TaskSnapshot snapshot = await task;
+    //   url = await snapshot.ref.getDownloadURL();
+    //   setState(() {
+    //     url = url;
+    //   });
+    // } on Exception catch (e) {
+    //   print(e);
+    // }
+    // await FirebaseFirestore.instance
+    //     .collection('member')
+    //     .doc(widget.id)
+    //     .update({
+    //   'url': url,
+    // }).whenComplete(() => {Navigator.pushNamed(context, 'member')});
   }
 
   TextEditingController _from = TextEditingController();
@@ -161,7 +160,7 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                       Container(
                         width: 200,
                         height: 200,
-                        decoration: '${widget.imageUrl}'.isEmpty
+                        decoration: '${widget.imageUrl}' == null
                             ? BoxDecoration(border: Border.all())
                             : BoxDecoration(),
                         alignment: Alignment.center,
@@ -386,213 +385,149 @@ class _MemberDetailScreenState extends State<MemberDetailScreen> {
                     ],
                   ),
                   Divider(),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     Padding(
-                  //       padding: const EdgeInsets.all(12.0),
-                  //       child: Container(
-                  //         width: MediaQuery.of(context).size.width * .4,
-                  //         child: Column(
-                  //           crossAxisAlignment: CrossAxisAlignment.start,
-                  //           children: [
-                  //             Text("From"),
-                  //             TextFormField(
-                  //               controller: _from,
-                  //               readOnly: true, // Prevent manual input
-                  //               decoration: InputDecoration(
-                  //                 labelText: 'Select Date',
-                  //                 suffixIcon: GestureDetector(
-                  //                   onTap: () => _selectDate(context),
-                  //                   child: Icon(Icons.calendar_today),
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       ),
-                  //     ),
-                  //     Padding(
-                  //       padding: const EdgeInsets.all(12.0),
-                  //       child: Container(
-                  //         width: MediaQuery.of(context).size.width * .4,
-                  //         child: Column(
-                  //           crossAxisAlignment: CrossAxisAlignment.start,
-                  //           children: [
-                  //             Text("To"),
-                  //             TextFormField(
-                  //               controller: _to,
-                  //               readOnly: true, // Prevent manual input
-                  //               decoration: InputDecoration(
-                  //                 labelText: 'Select Date',
-                  //                 suffixIcon: GestureDetector(
-                  //                   onTap: () => _selectTo(context),
-                  //                   child: Icon(Icons.calendar_today),
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                  // Row(
-                  //   crossAxisAlignment: CrossAxisAlignment.start,
-                  //   children: [
-                  //     Padding(
-                  //       padding: const EdgeInsets.only(top: 8.00, left: 16.00),
-                  //       child: ElevatedButton.icon(
-                  //           onPressed: () {},
-                  //           icon: Icon(Icons.search),
-                  //           label: Text('Filter')),
-                  //     ),
-                  //   ],
-                  // ),
-                  // Divider(),
 
                   SizedBox(
                     height: 20,
                   ),
                   // Display member donations here
-                  StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection('memberDonation')
-                        .where('memberId', isEqualTo: widget.id)
-                        // .orderBy('date', descending: true)
-                        // .orderBy('timestamp', descending: true)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return CircularProgressIndicator();
-                      }
-                      final donations = snapshot.data!.docs;
-                      List<Widget> donationWidgets = [];
-                      for (var donation in donations) {
-                        final donationData =
-                            donation.data() as Map<String, dynamic>;
-                        final donationType = donationData['donationType'];
-                        final amount = donationData['amount'];
-                        final remarks = donationData['remarks'];
-                        final date = donationData['date'];
-                        DateTime donateDate = date.toDate();
-                        String formattedDate =
-                            DateFormat('yyyy-MM-dd').format(donateDate);
-                        // Create a widget to display each donation
-                        Widget donationWidget = ListTile(
-                          title: Text(''),
-                          subtitle: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: Colors.white, // White background color
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey
-                                      .withOpacity(0.5), // Shadow color
-                                  spreadRadius: 5,
-                                  blurRadius: 10,
-                                  offset: Offset(0, 4), // Offset of the shadow
-                                ),
-                              ],
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Center(
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Image(
-                                          image: donationType == 'jennsy'
-                                              ? AssetImage('images/jensy.png')
-                                              : AssetImage('images/donate.png'),
-                                          height: 30,
-                                          width: 30,
-                                        ),
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          children: [
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    donationType == 'cash'
-                                                        ? "Rs. " +
-                                                            donation['amount']
-                                                                .toString()
-                                                        : donation['jennsy'],
-                                                    style: TextStyle(
-                                                        fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.w500),
-                                                  ),
-                                                  Divider(),
-                                                  Text(
-                                                    "Remarks: " +
-                                                        donation['remarks'],
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400),
-                                                  )
-                                                  // Text("Number: " +
-                                                  //     donation['donated'].toString()),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    Divider(),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Row(children: [
-                                          Icon(Icons.date_range),
-                                          SizedBox(
-                                            width: 5,
-                                          ),
-                                          // Text(formattedDateTime)
-                                        ]),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        Text(
-                                          formattedDate,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        )
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                        donationWidgets.add(donationWidget);
-                      }
+                  // StreamBuilder<QuerySnapshot>(
+                  //   stream: FirebaseFirestore.instance
+                  //       .collection('memberDonation')
+                  //       .where('memberId', isEqualTo: widget.id)
+                  //       // .orderBy('date', descending: true)
+                  //       // .orderBy('timestamp', descending: true)
+                  //       .snapshots(),
+                  //   builder: (context, snapshot) {
+                  //     if (!snapshot.hasData) {
+                  //       return CircularProgressIndicator();
+                  //     }
+                  //     final donations = snapshot.data!.docs;
+                  //     List<Widget> donationWidgets = [];
+                  //     for (var donation in donations) {
+                  //       final donationData =
+                  //           donation.data() as Map<String, dynamic>;
+                  //       final donationType = donationData['donationType'];
+                  //       final amount = donationData['amount'];
+                  //       final remarks = donationData['remarks'];
+                  //       final date = donationData['date'];
+                  //       DateTime donateDate = date.toDate();
+                  //       String formattedDate =
+                  //           DateFormat('yyyy-MM-dd').format(donateDate);
+                  //       // Create a widget to display each donation
+                  //       Widget donationWidget = ListTile(
+                  //         title: Text(''),
+                  //         subtitle: Container(
+                  //           decoration: BoxDecoration(
+                  //             borderRadius: BorderRadius.circular(8),
+                  //             color: Colors.white, // White background color
+                  //             boxShadow: [
+                  //               BoxShadow(
+                  //                 color: Colors.grey
+                  //                     .withOpacity(0.5), // Shadow color
+                  //                 spreadRadius: 5,
+                  //                 blurRadius: 10,
+                  //                 offset: Offset(0, 4), // Offset of the shadow
+                  //               ),
+                  //             ],
+                  //           ),
+                  //           child: Padding(
+                  //             padding: const EdgeInsets.all(8.0),
+                  //             child: Center(
+                  //               child: Column(
+                  //                 children: [
+                  //                   Row(
+                  //                     mainAxisAlignment:
+                  //                         MainAxisAlignment.spaceBetween,
+                  //                     children: [
+                  //                       Image(
+                  //                         image: donationType == 'jennsy'
+                  //                             ? AssetImage('images/jensy.png')
+                  //                             : AssetImage('images/donate.png'),
+                  //                         height: 30,
+                  //                         width: 30,
+                  //                       ),
+                  //                       Column(
+                  //                         mainAxisAlignment:
+                  //                             MainAxisAlignment.end,
+                  //                         crossAxisAlignment:
+                  //                             CrossAxisAlignment.end,
+                  //                         children: [
+                  //                           SizedBox(
+                  //                             width: 5,
+                  //                           ),
+                  //                           Padding(
+                  //                             padding:
+                  //                                 const EdgeInsets.all(8.0),
+                  //                             child: Column(
+                  //                               crossAxisAlignment:
+                  //                                   CrossAxisAlignment.start,
+                  //                               children: [
+                  //                                 Text(
+                  //                                   donationType == 'cash'
+                  //                                       ? "Rs. " +
+                  //                                           donation['amount']
+                  //                                               .toString()
+                  //                                       : donation['jennsy'],
+                  //                                   style: TextStyle(
+                  //                                       fontSize: 20,
+                  //                                       fontWeight:
+                  //                                           FontWeight.w500),
+                  //                                 ),
+                  //                                 Divider(),
+                  //                                 Text(
+                  //                                   "Remarks: " +
+                  //                                       donation['remarks'],
+                  //                                   style: TextStyle(
+                  //                                       fontWeight:
+                  //                                           FontWeight.w400),
+                  //                                 )
+                  //                                 // Text("Number: " +
+                  //                                 //     donation['donated'].toString()),
+                  //                               ],
+                  //                             ),
+                  //                           ),
+                  //                         ],
+                  //                       ),
+                  //                     ],
+                  //                   ),
+                  //                   Divider(),
+                  //                   Row(
+                  //                     mainAxisAlignment:
+                  //                         MainAxisAlignment.spaceBetween,
+                  //                     crossAxisAlignment:
+                  //                         CrossAxisAlignment.center,
+                  //                     children: [
+                  //                       Row(children: [
+                  //                         Icon(Icons.date_range),
+                  //                         SizedBox(
+                  //                           width: 5,
+                  //                         ),
+                  //                         // Text(formattedDateTime)
+                  //                       ]),
+                  //                       SizedBox(
+                  //                         width: 10,
+                  //                       ),
+                  //                       Text(
+                  //                         formattedDate,
+                  //                         style: TextStyle(
+                  //                             fontWeight: FontWeight.bold),
+                  //                       )
+                  //                     ],
+                  //                   )
+                  //                 ],
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       );
+                  //       donationWidgets.add(donationWidget);
+                  //     }
 
-                      return Column(
-                        children: donationWidgets,
-                      );
-                    },
-                  ),
+                  //     return Column(
+                  //       children: donationWidgets,
+                  //     );
+                  //   },
+                  // ),
                 ],
               ),
             ),

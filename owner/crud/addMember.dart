@@ -7,6 +7,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sewak/owner/crud/modal.dart';
 
+import 'package:intl/intl.dart';
+// import 'package:sewak/owner/crud/updateKaryasamiti.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 class AddMember extends StatefulWidget {
   const AddMember({super.key});
 
@@ -358,65 +363,71 @@ class _AddMemberState extends State<AddMember> {
       setState(() {
         isLoading = true;
       });
-      print('sending-data');
-      final docUser = FirebaseFirestore.instance.collection('member').doc();
-      // uploadFile();
-      final members = Members(
-        id: docUser.id,
-        first_name: firstName.text,
-        last_name: lastName.text,
-        address: address.text,
-        number: number.text,
-        email: email.text,
-        blood: blood.text,
-        url: "",
+
+      final response = await http.post(
+        Uri.parse(
+            'https://sewak.watnepal.com/api-register-member'), // Replace with your API endpoint
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'username': email.text,
+          'email': email.text,
+          'password': '123456',
+          'user_type': 'customer', // Specify 'customer' as the user type
+          'number': number.text, // Replace with the customer's phone number
+          'blood': blood.text, // Replace with the customer's blood type
+          'address': address.text, // Replace with the customer's address
+          'profile_pic': "",
+          // You can include the profile picture as base64 data if needed
+        }),
       );
-      final json = members.toJson();
-      await docUser
-          .set(json)
-          .whenComplete(() => {Navigator.pushNamed(context, 'member')});
-      // setState(() {
-      //   isLoading = false;
-      // });
+
+      if (response.statusCode == 201) {
+        // User registration successful
+        print('Customer registered successfully');
+      } else {
+        // User registration failed
+        print('Failed to register customer: ${response.body}');
+      }
     } else {
       setState(() {
         isLoading = true;
       });
-      try {
-        var imagefile = FirebaseStorage.instance
-            .ref()
-            .child("image")
-            .child("/${firstName.text}.jpg");
-        UploadTask task = imagefile.putFile(file!);
-        TaskSnapshot snapshot = await task;
-        url = await snapshot.ref.getDownloadURL();
-        setState(() {
-          url = url;
-        });
-      } on Exception catch (e) {
-        print(e);
-      }
 
-      print('sending-data');
-      final docUser = FirebaseFirestore.instance.collection('member').doc();
-      // uploadFile();
-      final members = Members(
-        id: docUser.id,
-        first_name: firstName.text,
-        last_name: lastName.text,
-        address: address.text,
-        number: number.text,
-        email: email.text,
-        blood: blood.text,
-        url: url,
+      String apiUrl =
+          'https://sewak.watnepal.com/api-register-member'; // Replace with your API endpoint
+
+      // Read the image file and convert it to base64
+      List<int> imageBytes = await file!.readAsBytes();
+      String base64Image = base64Encode(imageBytes);
+
+      Map<String, dynamic> requestBody = {
+        'username': email.text,
+        'email': email.text,
+        'first_name': firstName.text,
+        'last_name': lastName.text,
+        'password': '123456',
+        'user_type': 'customer', // Specify 'customer' as the user type
+        'number': number.text, // Replace with the customer's phone number
+        'blood': blood.text, // Replace with the customer's blood type
+        'address': address.text, // Replace with the customer's address
+        'profile_pic': base64Image
+      };
+
+      var response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(requestBody),
       );
-      final json = members.toJson();
-      await docUser
-          .set(json)
-          .whenComplete(() => Navigator.pushNamed(context, 'member'));
-      // setState(() {
-      //   isLoading = false;
-      // });
+
+      if (response.statusCode == 200) {
+        print('Image uploaded successfully');
+      } else {
+        print('Failed to upload image:  ${response.body}');
+      }
     }
   }
 

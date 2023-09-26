@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class CashDonationPage extends StatefulWidget {
-  final String memberId;
+  final int memberId;
 
   CashDonationPage({required this.memberId});
 

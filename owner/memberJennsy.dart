@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class JennsyDonationPage extends StatefulWidget {
-  final String memberId;
+  final int memberId;
 
   JennsyDonationPage({required this.memberId});
 

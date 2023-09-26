@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sewak/component/customerDrawer.dart';
 import 'package:sewak/component/drawer.dart';
+import 'package:sewak/customer/newsDetails.dart';
 import 'package:sewak/owner/crud/modal.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -32,24 +33,6 @@ class _CustomerNewsState extends State<CustomerNews> {
           padding: const EdgeInsets.all(8.0),
           child: Column(children: [
             // Add other widgets above the StreamBuild
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14.0),
-              child: TextField(
-                controller: searchController,
-                decoration: InputDecoration(
-                  hintText: 'Search by title',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    searchQuery = value;
-                  });
-                },
-              ),
-            ),
 
             Divider(),
             Expanded(
@@ -57,13 +40,6 @@ class _CustomerNewsState extends State<CustomerNews> {
             ),
           ]),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.pushNamed(context, 'addNews');
-          },
-          child: Icon(Icons.add),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
     );
   }
@@ -144,7 +120,7 @@ class _NewsListState extends State<NewsList> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => UpdateNews(
+                              builder: (context) => CustomerNewsDetail(
                                 id: searchedMembers[index]['id'],
                                 title: searchedMembers[index]['title'],
                                 description: searchedMembers[index]

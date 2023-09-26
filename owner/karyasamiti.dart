@@ -140,24 +140,7 @@ class _KaryasamitiListState extends State<KaryasamitiList> {
                       elevation:
                           5, // Add some elevation for a card-like appearance
                       child: InkWell(
-                        onTap: () {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => UpdateKaryasamiti(
-                          //       id: searchedMembers[index]['id'],
-                          //       name: searchedMembers[index]['name'],
-                          //       description: searchedMembers[index]
-                          //           ['description'],
-                          //       imageUrl:
-                          //           searchedMembers[index]['image'] == null
-                          //               ? ""
-                          //               : searchedMembers[index]['image'],
-                          //       date: formattedCreatedAt,
-                          //     ),
-                          //   ),
-                          // );
-                        },
+                        onTap: () {},
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
